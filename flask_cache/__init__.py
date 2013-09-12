@@ -69,6 +69,7 @@ class Cache(object):
     def __init__(self, app=None, with_jinja2_ext=True, config=None):
         self.with_jinja2_ext = with_jinja2_ext
         self.config = config
+        self.actually_used = False
 
         self.app = app
         if app is not None:
@@ -135,6 +136,10 @@ class Cache(object):
     @property
     def cache(self):
         app = self.app or current_app
+        if not self.actually_used:
+            self._set_cache(app, app.config)
+            self.actually_used = True
+
         return app.extensions['cache'][self]
 
     def get(self, *args, **kwargs):
